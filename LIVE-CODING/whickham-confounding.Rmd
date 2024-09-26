@@ -112,7 +112,7 @@ What do your answers to part 5 tell you about the variable `age` in this data se
   
 ## A simple correction for confounding
 
-As we can see, confounding variables, if ignored, can lead to un-intuitive and even misleading conclusions about the relationship between smoking and survival. 
+As we can see, confounding variables, if ignored, can lead to unintuitive and even misleading conclusions about the relationship between smoking and survival. 
 
 **PARTICIPATION 1: Please do your calculations for exercise 7 and then record your answers from the table into CANVAS for the quiz titled Participation 1**
 
