@@ -41,7 +41,9 @@ knitr::include_graphics("Whickham.png")
 
 ## Exploring the data
 
-Let's load the data and take a peek:
+Let's load the data into our working environment by typing `data(Whickham)` in the Console. 
+
+You can also get a snapshot of the data with the `glimpse` function which can be typed either in the Console or in your Rmarkdown document.
 
 
 ```{r look-at-data, echo=FALSE}
