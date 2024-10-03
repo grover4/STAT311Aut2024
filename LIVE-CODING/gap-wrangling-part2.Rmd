@@ -40,7 +40,7 @@ In the following code chunk, I have created a new variable called `LifeExp_cat` 
 
 ```{r ex1, eval = FALSE}
 
-    gapminder <- gapminder %>% 
+gapminder <- gapminder %>% 
                   mutate( lifeExp_cat = ifelse(lifeExp < 50, 
                                                "below 50", 
                                                "at least 50") )
@@ -66,7 +66,8 @@ Summarize life expectancy `lifeExp` in 1952 for each continent separately by cal
 
 ### Exercise 6
 
-Create a new variable called `popMil` which is the population in millions. For example, 8425333 is 8.425333 millions.  Then use this new variable to calculate the total population in the world for each year. 
+Create a new variable called `popBil` which is the population in billions. For example, 8425333 is .008425333 billions.  Then use this new variable to calculate the total population in the world for each year. 
+
 
 
 **Participation 2: Please do your calculations for the remaining problems below and then record your answers in CANVAS for the quiz titled Participation 2**
@@ -77,37 +78,19 @@ Create a new variable called `popMil` which is the population in millions. For e
 
 Summarise the life expectancy `lifeExp` in 1952 by calculating the mean.
 
-```{r}
-gapminder %>% filter(year == 1952) %>% summarise(mean(lifeExp))
-```
 
 ### Exercise 8
 
 Summarise the life expectancy `lifeExp` in Asia in 1952 by calculating the mean. 
-```{r}
-gapminder %>% filter(year == 1952, continent == "Asia") %>% summarise(mean(lifeExp))
-```
+
 
 ### Exercise 9
 
 Summarise the life expectancy `lifeExp` for each continent in 2002 by calculating the median. Sort your results in descending order.
-```{r}
-gapminder %>% filter(year == 2002) %>% 
-  group_by(continent) %>% summarise(median_life = median(lifeExp)) %>% 
-        arrange(desc(median_life))
-```
+
 
 ### Exercise 10
 
-Create a new variable called `gdp` which recovers each country's GDP by multiplying the population `pop` and GDP per capita `gdpPercap`. Summarise the `gdp` for each country by calculating the total across all the years. Which 5 countries have the highest totals?
+Create a new variable called `gdp` which recovers each country's GDP by multiplying the population `pop` and GDP per capita `gdpPercap`. Summarise the `gdp` for each country by calculating the total across all the years. Which 3 countries have the highest totals?
 
-```{r}
-gapminder %>%
-             mutate(gdp = gdpPercap*pop) %>%
-              group_by(country) %>% 
-                summarise(total_gdp = sum(gdp)) %>%
-                      arrange(desc(total_gdp) )
-                 
-```
- 
 
