@@ -84,7 +84,7 @@ The variable `veh_count` describes the number of cars involved in the collision.
 
 ### Warm up 3
 
-The variable `addr_type` describes the location of the accident. Where do most accidents occur?  Create a frequency table of `addr_type` in descending order of frequency.
+The variable `addr_type` describes the location of the accident. Where do most accidents occur?  Create a frequency table of `addr_type`.
 
 
 * * * 
