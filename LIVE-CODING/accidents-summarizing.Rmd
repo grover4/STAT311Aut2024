@@ -84,7 +84,7 @@ The variable `veh_count` describes the number of cars involved in the collision.
 
 ### Warm up 3
 
-The variable `addr_type` describes the location of the accident. Where do most accidents occur?  Create a frequency table of `addr_type`.
+The variable `addr_type` describes the location of the accident. Where do most accidents occur?  Create a frequency table of `addr_type`. (see slide 10 from the slidedeck posted for 10/16)
 
 
 * * * 
@@ -122,7 +122,7 @@ Now let us examine whether light conditions influence whether or not a parked ca
 
 ### Exercise 3
 
-Write code to create a contingency table of the frequencies for `light_cat` and `hit_parked_car`. If there is no association between these variables, what % of cars should be hit regardless of light conditions?
+Write code to create a contingency table of the frequencies for `light_cat` and `hit_parked_car`. If there is no association between these variables, what % of cars should be hit regardless of light conditions?   (see slide 14 from the slidedeck posted for 10/16)
 
 
 ### Exercise 4
