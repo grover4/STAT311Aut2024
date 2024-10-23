@@ -65,24 +65,11 @@ Write code to make a histogram of `bty_avg`. Comment on the shape. Also calculat
 
 Create a scatterplot of the relationship between `score` and `bty_avg`. Add a line to the plot using a `geom_smooth` layer. Comment on the form, direction and strength of the relationship.
 
-```{r}
-ggplot(data = evals,
-       mapping = aes(x = bty_avg,
-                     y = score) ) + 
-     geom_point() +
-     geom_smooth(method = "lm")
-
-```
 
 ### Exercise 4
 
 Fit a simple linear regression model `evals_slr` predicting the course evaluation `score` from the `bty_avg`. Print the results in a tidy format. Write the equation of the fitted line and interpret the slope (and intercept).
 
-```{r}
-evals_slr <- lm(score ~ bty_avg, data = evals)
-
-evals_slr_fit %>% tidy()
-```
 
 ### Exercise 5
 
@@ -98,34 +85,11 @@ In this part, we will practice fitting a linear regression model with `score` as
 
 We know from Part I that `bty_avg` has a weak relationship with the course evaluation `score`.  Does `gender` influence `score`? Make a boxplot to examine this. Also calculate numerical summaries of the score by gender.
 
-```{r}
-
-ggplot(data = evals,
-       mapping =aes(y = gender,
-                    x = score,
-                    fill = gender))+
-      geom_boxplot()
-
-evals %>% group_by(gender) %>% 
-  summarise( xbar = mean(score), median = median(score), 
-             q25 = quantile(score, 0.25),
-             q75 = quantile(score, 0.75))
-
-```
 
 ### Exercise 2
 
-Create a scatter plot of `score` vs `bty_avg` colored by `gender`. Use `geom_smooth` to fit two lines to the data: one for males and another for females.
+Create a scatter plot of `score` vs `bty_avg` colored by `gender`. Observations?
 
-```{r}
-ggplot(data = evals, 
-       mapping=aes(x = bty_avg, 
-                   y = score,
-                   color = gender))+
-  geom_point() +
-  geom_smooth(method = "lm")
-
-```
 
 
 ### Exercise 3
@@ -140,58 +104,15 @@ Fit a main effects linear model, `evals_main`, predicting course evaluation `sco
     
     - Optional: if there is time, make a scatter plot of `score` vs `bty_avg` with the points colored by gender and overlay the fitted lines from the main effects model. 
 
-```{r main-effects}
-
-evals_main <- lm( score ~ bty_avg + gender, data = evals)
-
-evals_main  %>% tidy()
-
-ggplot(data=evals,
-       aes(x = bty_avg,
-           y = score,
-           color=gender))+
-  geom_point()+
-  geom_abline(slope = 0.074,intercept=3.747,color="red") +
-  geom_abline(slope = 0.074, intercept = 3.747+0.172,color="turquoise") 
-```
-
-
-The equation of the fitted line is score-hat = 3.747 + 0.074 * bty_avg + 0.172 * gendermale. 
-
-
-Slope: For an increase of 1 in the bty_avg score, we can expect an increase of 0.074 in the evaluation score. 
-
-Intercept: The score for men is 0.172 higher than for women (regardless of `bty_avg`).
-
 ### Exercise 4
 
 Repeat exercise 3 for an interaction effects linear model, `evals_int`, which predicts course evaluation `score` from  average beauty rating (`bty_avg`), `gender` and their interaction. 
 
-```{r}
-
-evals_int <- lm(score ~ bty_avg*gender, data = evals) 
-
-evals_int %>% tidy()
-```
-
-The equation of the fitted line is 
-
-score-hat = 3.95 + 0.031 * bty_avg - 0.184 * gendermale + 0.0796 * bty_avg * gendermale
-
- 
-For men: score-hat = 3.766 + 0.1106 * bty_avg 
-
-For women: score-hat = 3.95 + 0.031 * bty_avg
 
 ### Exercise 5
 
 Compare the models from Parts I and II by calculating goodness of fit measures like $R^2$ and adjusted $R^2$.
 
-```{r}
-glance(evals_slr) %>% select(adj.r.squared)
-glance(evals_main) %>% select(adj.r.squared)
-glance(evals_int) %>% select(adj.r.squared)
-```
 
 
 **PARTICIPATION: Please do your calculations for the following problem and then record your answers from the table into CANVAS for the quiz titled Participation 5**
