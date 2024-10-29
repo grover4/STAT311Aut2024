@@ -59,19 +59,6 @@ In this part, we will examine the numerical predictors first to identify a coupl
 
 Use `ggpairs` to make a scatter plot matrix of `score` versus the numeric predictors:  `age`, `bty_avg`, `cls_perc_eval`. 
 
-```{r}
-#correlation heat map
-#mycorr <- evals %>% select(age, bty_avg, cls_students, cls_perc_eval, score) %>% cor(use="complete.obs")
-
-#corrplot(mycorr)
-
-
-evals %>% 
-  select(age, bty_avg, cls_perc_eval,score) %>% 
-  ggpairs(lower=list(continuous = "smooth"))
-
-
-```
 
 
 The scatterplots don't show very strong relationships. Let's just pick `bty_avg` and `cls_perc_eval` as our numeric variables. They have slightly higher correlations with score (0.18) compared to age (-0.11). Also, `age` is somewhat correlated with `bty_avg`, so there is no need to have both in the model.
@@ -84,39 +71,13 @@ Fit a main effects model `model1` to predict `score` from `bty_avg` and `cls_per
    
    - Assess goodness of fit by calculating the adjusted R-square. Save this number in a variable called `model1_rsq` and report it within a complete sentence using inline code.
    
-```{r}
 
-model1 <- lm(score ~ cls_perc_eval + bty_avg, data = evals)
-
-model1 %>% tidy()
-
-model1_rsq <- glance(model1) %>% 
-              select(adj.r.squared) %>% pull()
-
-```
-   
    
 Now, let us turn our attention to adding a categorical predictor into our model equation.
 
 ### Exercise 3
 
 Make a visualization of `score` versus  `cls_level`. (You can also calculate grouped numerical summaries of `score` by `cls_level`)
-
-```{r}
-
-evals %>% select(rank, score) %>% ggpairs()
-
-evals %>% select(gender, score) %>% ggpairs()
-
-evals %>% select(cls_level, score) %>% ggpairs()
-
-evals %>% group_by(gender) %>% summarise(median_scr = median(score))
-
-evals %>% group_by(cls_level) %>% summarise(median_scr = median(score))
-
-evals %>% group_by(rank) %>% summarise(median_scr = median(score))
-
-```
 
 ### Exercise 4
 
@@ -127,44 +88,28 @@ Fit a main effects model `model2` to predict  `score` from `bty_avg`, `cls_perc_
     - Assess goodness of fit by calculating the adjusted R-square. Save this number in a variable called `model2_rsq` and report it within a complete sentence using inline code.
    
 
-```{r}
-
-model2 <- lm(score ~ bty_avg + cls_perc_eval + cls_level, data = evals)
-
-model2 %>% tidy()
-
-model2_rsq <- glance(model2) %>% 
-              select(adj.r.squared) %>% pull()
-```
 
 
 
-
-
-
-
-Let us now add the adjusted R-suare (as a percentage and rounded to 2 digits) for `model1` and `model2`in the table below for easy comparison.
+Let us also add the adjusted R-squares numbers (as a percentage and rounded to 2 digits) for `model1` and `model2`in the table below for easy comparison.
 
 | Model     | Adjusted R square
 |:----      | :------------    
-| `model1`  | `r round(100 * model1_rsq,2)`
-| `model2`  | `r round(100 * model2_rsq,2)`
+| `model1`  | 
+| `model2`  | 
 
 
 
 ***OPTIONAL: For those who want to stretch***
 
 
-Let us now consider `rank` as a possible predictor of `score`. Notice that it has three levels: teaching, tenured and tenure track.
+Let us now consider `rank` as a possible predictor of `score`. Notice that it has three levels: teaching, tenured and tenure track. I have answered the question already to help you. See the slidedeck from Oct 30 starting on page 30 for more on categorical predictors with more than two categories.
 
-5. Make a visualization `score` versus  `rank`. (You can also calculate grouped numerical summaries of `score` by `rank``)
-
-
-6. Fit a main effects model `model3` to predict  `score` from `bty_avg`, and `rank`. 
+Fit a main effects model `model3` to predict  `score` from `bty_avg`, and `rank`. 
 
      - Present the output in a tidy format and write the equation of the fitted model.
    
-    - Assess goodness of fit by calculating the adjusted R-square. Save this in a variable called `model3_rsq` and report it within a complete sentence using inline code.
+    - Assess goodness of fit by calculating the adjusted R-square. Save this in number in a variable called `model3_rsq` and report it within a complete sentence using inline code.
     
 
 ```{r}
