@@ -141,11 +141,8 @@ null_dist <- classdata %>%
 
 Write code to visualize the null distribution of the sample proportion. What fraction of the samples gave a value which was at least as large as our observed value? 
 
-and calculate the P-value to assess how unusually large our value is. Fill in the blanks in the code chunk below. 
 
-
-
-Our graph from Exercise 5 shows us we should typically expect to see 50% of sample respondents choosing a front tire if the claim made in the null hypothesis is true. In fact we would only see a value at least as large as our sample value in 11 out of every 1,000 samples. We call 11/1000 the P-value of the test.
+Our graph from Exercise 5 shows us we should typically expect to see 50% of sample respondents choosing a front tire if the claim made in the null hypothesis is true. In fact we would only see a value at least as large as our sample value in 21 out of every 1,000 samples. We call 21/1000 the P-value of the test.
 
 So what should we conclude?
 
