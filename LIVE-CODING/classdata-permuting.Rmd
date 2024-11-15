@@ -168,7 +168,7 @@ Which of the following claims represents the null and which one is the alternati
 
     a. Males are more likely to drive faster (on average) than females
     
-    b. There is no effect of biology on driving speed; any differences we observe are simply due to sampling variability.
+    b. There is no relationship between one's biology and dating preferences; any differences we observe are simply due to sampling variability.
     
 ### Exercise 3
 
