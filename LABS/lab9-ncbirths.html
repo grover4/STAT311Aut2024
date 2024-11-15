@@ -1636,11 +1636,11 @@ looking picture.</li>
 <!--- not specifying binwidth gives a very jagged picture and I definitely want -0.2 off for people who did not spend any time trying to smooth the picture. 
 
 Statement: should touch on symmetric shape  and  give the mean and standard deviation for summaries. They could say it is left skewed and give median and IQR. If they give all the summaries, just let it go this time. --->
-<p><strong>A 1995 study suggests that average weight of Caucasian babies
-born in the US is 3,369 grams (7.43 pounds)</strong>. In this dataset we
-only have information on mother’s race, so we will make the simplifying
-assumption that babies of Caucasian mothers are also Caucasian,
-i.e. whitemom = “white”.</p>
+<p>A 1995 study suggests that average weight of Caucasian babies born in
+the US is 3,369 grams (7.43 pounds). In this dataset we only have
+information on mother’s race, so we will make the simplifying assumption
+that babies of Caucasian mothers are also Caucasian, i.e. whitemom =
+“white”.</p>
 <ol start="2" style="list-style-type: decimal">
 <li><p>Create a filtered data set called <code>ncbirths_white</code>
 that contains only data for white mothers. Then calculate the mean of
@@ -1821,7 +1821,7 @@ smoker).</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1111</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>boot_diff_means.df <span class="ot">&lt;-</span> ncbirths <span class="sc">%&gt;%</span> </span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(smoker)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(habit)) <span class="sc">%&gt;%</span> </span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>                  <span class="fu">specify</span>(<span class="at">response =</span> ___, </span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>                          <span class="at">explanatory =</span> ___ ) <span class="sc">%&gt;%</span></span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>                  <span class="fu">generate</span>(<span class="at">reps =</span> ___, </span>
