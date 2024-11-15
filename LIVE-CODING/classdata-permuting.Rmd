@@ -1,0 +1,193 @@
+---
+title: "Significance testing the class survey - Part II "
+subtitle: "Ranjini Grove"
+date: "`r Sys.Date()`"
+output:    
+      html_document:
+         toc: no
+         toc_float: no
+      editor_options:
+         chunk_output_type: console
+---
+
+Today we will test independence between two variables by conducting significance tests which use permutation as a way to mimic sampling variability. The data are the survey responses from STAT 311 students collected at the start of autumn quarter 2024. 
+
+The packages we will be using have been loaded in the code chunk below.
+
+```{r load-packages, include=FALSE}
+library(tidyverse)                 #umbrella suite
+library(tidymodels)                #modeling/inference
+library(janitor)                   #tabyl
+
+```
+
+## Data
+
+The class data was collected via a Google form and was downloaded as a CSV file named `classdata_au2024.csv`. The codebook with a description of the variables in the dataset is shown below. The overall data cleaning steps were extremely minimal. I renamed the variables so they were shorter. Additional data cleaning and recoding is done for the variables involved in specific analyses and these will be described in the relevant sections. All the code is included in the Rmarkdown document. 
+
+```{r data-cleaning, include = FALSE}
+classdata <- read_csv(file="classdata_au2024.csv")
+
+classdata <- classdata %>%
+             rename( class = contains("class standing"),
+               credits = contains("credits"),
+               diet = contains("vegetarian"),
+               sleep = contains("sleep"),
+               dating_pref=contains("attractive"),
+               sex=contains("sex"),
+               study=contains("study"),
+               birthday=contains("born"),
+               haircut=contains("haircut"),
+               shoes=contains("shoes"),
+               nervous=contains("nervous"),
+               siblings=contains("siblings"),
+               which_tire=contains("tire"),
+               height=contains("height"),
+               speed=contains("fastest"),
+               years_in_wa=contains("WA state"),
+               travel=contains("visited"),
+               salary=contains("earn"),
+               breakfast=contains("breakfast"),
+               eyewear=contains("eyeglasses"),
+               rent=contains("rent"),
+               climate_worry = contains("global warming") ) 
+
+```
+
+
+|Variable |  Description |
+| :----:  |  :--------  |
+|Timestamp| Self explanatory |
+|class    | What is your class standing?|
+|credits  | How many credits are you signed up for in Win 2022?|
+|vegetarian| Are you a vegetarian?|
+|sleep    | How many hours of sleep do you get on average at night?|
+|dating_pref| Would you date someone with a great personality even if you did not find them attractive? |
+| sex     | What is your biological sex? |
+|gender   | To which gender do you most closely identify? |
+|study    |How many hours do you study outside of classes (on average) per week? (if this is your first quarter at UW, you may skip this question) |
+|birthday | What day of the week were you born? |
+|section  | Which quiz section are you in? |
+|haircut | What is the most (in dollars) you have paid for a haircut? |
+|shoes   | How many pairs of shoes do you own? |
+|nervous | How nervous are you about taking STAT 311?|
+|siblings | How many siblings do you have? (include step sibs too)|
+|which_tire| Suppose you were late to an exam and decided to use the "flat tire" excuse. Which tire would you  pick?|
+|height | What is your height (in inches)?|
+|years_in_wa | How many years have you lived in WA state? (enter 0 if none, round your answer to a whole number)|
+|travel |How many states in the U.S. have you visited?|
+|salary| How much money did you earn last year (in dollars )? |
+|breakfast| Do you usually eat breakfast in the morning?|
+|eyewear | Do you wear eyeglasses or contact lenses?|
+|rent | What is your monthly rent?|
+|climate_worry| Scientists predict that global warming may have big effects on the polar regions within the next 100 years. One of the possible effects is that the northern ice cap may completely melt. Would this bother you a great deal, some, a little, or not at all if it actually happened?|
+
+
+## Exercises
+
+### Part 1: Are women superficial when it comes to dating?
+
+The variable `dating_pref` contains responses to the question "Would you date someone with a great personality even if you did not find them attractive?" In this exercise, we will conduct a hypothesis test to see whether males and females respond differently to this question..
+
+Warm up: get a quick birds-eye view of the variables `sex` and `dating_pref` to identify potential data cleaning steps and perform them,
+
+1. Make a table that presents a crosstab of `sex` versus `dating_pref`. Find the difference between the proportions of men and women who respond "yes" to the `dating_pref` question (Male - Female). Save this difference in a variable called `obs_diff`.
+
+
+Clearly men are more likely than women to say that they would be willing date someone they don't find attractive. In this part, we will examine whether this difference can be explained by sampling variability or if it points to a substantive difference between men and women.
+
+
+2. Which of the following claims represents the null and which one is the alternative hypothesis? 
+
+    a. Males are more likely than Females to say they are open to dating someone they don't find attractive 
+    
+    b. There is no relationship between one's biology and dating preferences.  Any differences we observe are due to sampling variability.
+
+We can once again use computer simulation to mimic sampling variability when the claim made in null hypothesis is true. 
+    
+3. Using `tidymodels` create a benchmark of what we should see for outcomes if the null hypothesis is true.
+
+```{r eval=F}
+set.seed(141)
+
+null_dist <- classdata %>%
+             filter(!is.na(sex), !is.na(dating_pref)) %>%
+             specify(response = ___,
+                     explanatory = ___,
+                     success = "___") %>%
+             hypothesize(null = "___") %>%
+             generate(reps = 1000, type = "___") %>%
+             calculate(stat = "___", 
+                        order=c("___", "___") )
+
+
+```
+
+4. Let's visualize the null distribution and calculate the P-value and make a conclusion. Fill in the blanks in the code chunk below. 
+
+```{r eval=F}
+
+null_dist %>% visualize() + 
+  shade_p_value(obs_stat = ___, 
+                direction = "___")
+
+null_dist %>% get_p_value(obs_stat = ___,
+                          direction = "___")
+
+```
+ 
+
+
+The P-value is reasonably small. It says that only 3.8% of the time would we see a difference at least as large as what we observed simply by sampling variability. Therefore, the difference is large enough that we can claim to have evidence that men are in fact more willing to date people they don't find attractive.
+
+
+In Part 1 we looked at whether a categorical explanatory variable (`sex`) is independent of a categorical response variable (`dating_pref`).
+
+The method described in Part 1 can be used to examine independence of a categorical explanatory variable and a numeric response variable as well.
+
+## Part II: Are men more likely to drive faster?
+
+In the class survey, you were asked to report what is the fastest you have ever driven. This is stored in the column `speed`.
+
+Warm up: Examine the variable `speed`.
+
+### Exercise 1
+
+Find the difference in average fastest speeds reported by males versus females. Save this difference in a variable called `obs_diff`.
+
+
+
+As the results make clear, males report higher average speeds. In this part, we will examine whether this difference can be explained by sampling variability or if it points to a substantive difference between men and women. 
+
+Last week, we used bootstrapping to calculate an interval estimate for the difference in average speeds reported by men and women. We found our interval did not contain zero suggesting that there is a difference in driving behaviors. Let's see what we can conclude with a significance test. 
+
+### Exercise 2
+
+A significance test pits two claims against each other.
+Which of the following claims represents the null and which one is the alternative hypothesis? 
+
+    a. Males are more likely to drive faster (on average) than females
+    
+    b. There is no effect of biology on driving speed; any differences we observe are simply due to sampling variability.
+    
+### Exercise 3
+
+Using `tidymodels` create a benchmark of what we should see for outcomes if the null hypothesis is true. The seed has been set to 311. Fill in the blanks in the code chunk below to find the null distribution of the difference in proportions (Male - Female).
+
+```{r}
+set.seed(311)
+
+
+
+```
+
+
+### Exercise 4
+
+Visualize the null distribution and calculate the P-value
+
+
+What should we conclude?
+
+
+
