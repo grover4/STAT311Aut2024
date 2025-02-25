@@ -1,0 +1,533 @@
+---
+title: "Lab 10: The General Social Survey"
+output:
+  html_document:
+    css: ../lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, 
+                      results = TRUE, 
+                      fig.show = "show", 
+                      message = FALSE)
+library(emo)
+```
+
+
+![](gss.JPG)
+
+The [General Social Survey (GSS)](https://gss.norc.org/About-The-GSS) is a nationally representative survey of adults in the United States which collects data on contemporary American society in order to monitor and explain trends in opinions, attitudes and behaviors.
+
+The GSS contains a standard core of demographic, behavioral, and attitudinal questions, plus topics of special interest. Among the topics covered are civil liberties, crime and violence, intergroup tolerance, morality, national spending priorities, psychological well-being, social mobility, and stress and traumatic events.
+
+Altogether, the GSS is the single best source for sociological and attitudinal trend data covering the United States. It allows researchers to examine the structure and functioning of society in general, as well as the role played by relevant subgroups and to compare the United States to other nations.
+
+<!---The GSS has adapted questions from earlier surveys, thereby allowing researchers to conduct comparisons for up to 80 years.
+
+The GSS contains a standard core of demographic, behavioral, and attitudinal questions, plus topics of special interest. Among the topics covered are civil liberties, crime and violence, intergroup tolerance, morality, national spending priorities, psychological well-being, social mobility, and stress and traumatic events.
+
+Altogether, the GSS is the single best source for sociological and attitudinal trend data covering the United States. It allows researchers to examine the structure and functioning of society in general, as well as the role played by relevant subgroups and to compare the United States to other nations.
+--->
+
+In this lab, you will learn to create a custom subset of the GSS survey data containing two categorical variables and then conduct hypothesis tests. 
+
+<!---Please review the following [slides](https://canvas.uw.edu/courses/1483091/pages/lectures) and the this [video](https://washington.zoom.us/rec/play/a8HbuMgUlDVva3l5--Fc9NIoqYo5z7-rbyn1DOSlPOcGKWN4lug5fY5P5lHaMW5k6iubaSvQ84n_Eju7.HgyBVWWl9NkUCNlF) for help with the statistical content as well as creating a custom subset of data from the SDA archives.--->
+
+**Resources** Please consult the slidedecks on hypothesis tests from week 8 on the Class Schedule. for help with the various functions on this lab. You should also look at the files `classdata-simulation.Rmd` and  `classdata-permuting.Rmd` on the COURSE_MATERIALS/LIVE_CODING sub-folder on the Hub for help.
+
+<div id="boxedtext">
+**Learning Objectives**
+
+- Create a custom dataset
+- Perform hypothesis tests for testing a point null hypothesis using simulation
+- Perform hypothesis tests for examining independence of two variables using randomization
+
+</div>
+
+* * * 
+
+## Getting Started
+
+### Creating a custom subset of the GSS
+
+As mentioned in the introduction, we will learn how to generate a customized subset of data from the GSS.  The *Survey Documentation and Analysis* (SDA) archive makes it particularly easy for us to access a variety of data from national surveys, including the GSS. Click on this [link](https://sda.berkeley.edu/index.html) for information on the SDA archive and to access datasets available on their site.
+
+Please follow these steps carefully to create your data subset. 
+
+- Select the the **Archive** tab on the top of the page, scroll down to the section which lists the **General Social Survey** datasets and then select the Cumulative Data File 1972-2022 (<span style="color:red;"> release 2 </span>). This should take you to the following [page](https://sda.berkeley.edu/sdaweb/analysis/?dataset=gss22rel2)
+
+
+- Click on **Download Custom Subset** and then select the option to generate and download a **Comma Separated Values** (CSV) dataset. Be sure to also check the box requesting the codebook. The codebook describes how the variables are measured and the missing value codes.
+See the screenshot below. 
+
+![](screen1.PNG)
+
+- Next, click on the **Select Cases** tab and filter the data for 2022 by typing `year(2022)` in the box. (note: no spaces!)
+
+- Next, move on to the **Select Variables** tab and use the tree to select the following variables from the following categories by clicking on the box next to them:
+
+|RESPONDENT BACKGROUND VARIABLES  | VARIABLES 
+|:-----------------------         | :-------  
+| Age, Gender, Race, Ethnicity    | `sex`, `race`
+
+| VOTING PATTERNS (1968-2012)     | VARIABLE
+|:------------------------------- |:-------
+|                                 | `partyid`
+
+|VARIABLES ADDED IN 2022          | VARIABLE
+|:-----------------------         | :-------  
+| Vote2020                        | `pres2020`
+
+
+- Finally choose the **Create Files** tab. Make sure you have all the 4 variables shown above by selecting the "Show List of All Variables Selected for Subset".
+
+Now that the data subsetting is complete, select the option to download the data file and also the codebook. You should have 3,544 rows in your data subset as shown below.
+
+![](download.JPG)
+
+If all goes well, you should see the files  called `sub-data.txt` and `sub-cdbk.txt` in your Downloads folder which contains the data and codebook you requested.
+
+
+### Uploading and reading in the data 
+
+Launch the RStudio image on JupyterHub by clicking [here](https://jupyter.rttl.uw.edu/2024-spring-autumn-311-a/user-redirect/rstudio){target="_blank"}.
+Create a new lab report template to save your answers to the exercises as usual.  Be sure to personalize the header with the title of the lab and also add your name. You can also change the output type to `html_document` like you did on Lab 5 and customize the theme of your report to your liking. 
+
+
+Use the **Upload** button in Rstudio to upload the data file `sub-data.txt` you just created to our server. Be sure to save the file to the same folder where your lab report lives.  **Set your working directory to this folder as well so you can run code interactively from the Console.** 
+
+Click on the datafile and take a look at what you have created!
+It may seem confusing as the columns are separated by commas and not aligned. If you open the codebook and look at how the variables are encoded, you will also obtain a better understanding of what you see. In particular, there are several missing data codes accounting for the various reasons why a response may be missing: .d,.i,.j,.m,.n,.p,.q,.r,.s,.u,.x,.y,.z
+
+### Load packages
+
+In this lab, we will use the **tidyverse** and **tidymodels** packages. We will also use the **janitor** package for making tables. Go ahead and add these packages to your document in the `setup` code chunk at the top of your Rmarkdown document. 
+
+```{r load-packages, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(janitor)
+```
+
+<!---
+## Creating a custom subset
+
+**Be sure to type all the code in this section in ONE code chunk called `create-data` with chunk options set to `echo=FALSE` and `eval=FALSE`. You will only be running all the code in this section interactively by submitting to the Console. The goal is to create a CSV file which you will then work with for the remainder of the analysis.**
+
+### Importing data
+
+The **readr** package within the **tidyverse** suite provides a friendly way to read rectangular data. It is one of the eight core packages of **tidyverse** that is automatically uploaded when we invoke the tidyverse.  --->
+
+Read in the custom data by typing the following in the `load-packages` code chunk and then running the code chunk by clicking the green "Play" button to load the packages and dataframe into your interactive environment. <!---Be sure that you have set the chunk options `echo=FALSE` and also `eval=FALSE`. You will only be running the code interactively in the Console.--->
+
+```{r read-data}
+
+gss_subset <- read_csv(file = "sub-data.txt",
+                       na = c(".d", ".i", ".j",".m",".n",".p",".q",".r",".s",".u",".x",".y",".z"))
+
+```
+
+<!---
+We are explicitly *coercing* the format for each variable inside a **list** since the values for the variables were entered in a numeric format and will be read in as such by default. This is an optional step since you can always mutate new character variables once you have read in the data.  Note that you can also just type `col_types="cc"` which should achieve the same result.
+
+
+There are several choices for `col_types` and they are listed below. You will most likely only ever need to use `col_double()` and `col_integer()` in addition to `col_character`. 
+
+**type function**  | **data type**
+------------------ | -------------
+`col_character()`  | character
+`col_date()`       | date
+`col_datetime()`   | POSIXct (date-time)
+`col_double()`     | double (numeric)
+`col_factor()`     | factor
+`col_guess()`      | let readr guess (default)
+`col_integer()`    | integer
+`col_logical()`    | logical
+`col_number()`     | numbers mixed with non-number characters
+`col_numeric()`    | double or integer
+`col_skip()`       | do not read
+`col_time()`       | time
+--->
+
+This is a good time to take a quick peek at the data frame `gss_subset` and make sure everything worked smoothly. Go ahead and type the following in the Console. 
+
+```{r echo=T,eval = F}
+glimpse(gss_subset)  #type in Console
+```
+
+
+<div id="boxedtext">
+
+`r emo::ji("stop")` Please be sure to check you have the complete dataset as instructed above. We will take off credit if you did not do this step properly as it will affect your answers to all the questions in the exercises.
+
+</div>
+
+
+1. Using the codebook, make a table as shown below which describes each variable in the dataframe `gss_subset` and then give the possible values this variable can take, with the label of what each value means. 
+
+
+    |Variable name| Description          
+    |:----------  |:------------------- 
+    |`sex`        |                     
+    |`race`       |                     
+    |`partyid`    | 
+    |`pres20`     |
+
+
+
+
+## Data recoding
+
+If you're lucky, the values for the variables will be entered exactly as you would like and there will be no missing values. More often than not however, you will likely have to rename, recode etc. 
+
+You will notice from the output of `glimpse` and your codebook that all the categorical variables have been entered as numeric values which results in the variables being encoded as "dbl" which stands for double precision. In the following we will recode them as character variables so their values are more intuitive.
+
+For example, consider the variable `sex` whose distribution is shown below:
+
+```{r echo =F, eval = T}
+
+gss_subset %>% count(sex)
+```
+
+
+2. Create and add to the dataframe a new variable called `sex_label` which takes the value "male" (`sex = 1`) and "female" (`sex = 2`) and print a frequency distribution of  the new variable using `count`. Be sure to show code and output (without messages/warnings)
+   
+   **Hint** use `ifelse`
+   
+    ```{r recode-sex, include = FALSE}
+
+    gss_subset <- gss_subset %>% 
+                mutate(sex_label = ifelse(sex == 1, "male", "female" ))
+
+    gss_subset %>% count(sex_label)
+    ```
+
+You might notice that the output from `count` in exercise 2 prints the frequencies in alphabetical order (female, male). Also, it is nice that the `ifelse` recognizes that certain rows are missing values and does not alter them in anyway.
+
+The recoding of `sex` was fairly straightforward since it had only two categories. In cases where the categorical variable has more than two categories, we may wish to combine several categories into one, and/or recode certain levels as missing. 
+
+For example, consider the variable `pres20` which records who the respondent voted for in the 2020 U.S. Presidential Elections: 
+
+```{r echo=F, eval = T}
+
+gss_subset %>% count(pres20)
+
+```
+
+<!---
+The values and their labels are shown below.
+
+|VALUE|  LABEL
+|:--- | :--- 
+|  1  | biden
+|  2  | trump
+|  3  | other candidate
+|  4  | didn't vote for president
+--->             
+             
+Say we wish to create a new variable `support_biden` from `pres20` as follows:
+
+|VALUE of `pres20`|  `support_biden`
+|:--- | :--- 
+|  1  | yes
+|  2 or 3  | no
+|  4   | NA
+             
+A single `ifelse` is inadequate for this purpose since we have more than one condition at play here. There are many ways to accomplish this. The next exercise shows one way using a nested `ifelse`.
+
+3. Fill in the blanks in the code below to create and add a new variable `support_biden` to the dataframe which takes the value "yes" when `pres20 =1`, "no" when `pres20 = 2` or `pres20 = 3` and is considered missing when `pres20 = 4`. Print the frequency distribution of the variable you have just created. Be sure to show code and output (without messages/warnings).
+
+    *Tip* check the frequency distribution of the new variable with the one for the old variable shown above to verify things got recoded as intended.
+
+    ```{r eval = F}
+    
+    gss_subset <- ___ %>%
+            mutate( support_biden = ifelse(pres20 == ___, "yes",
+                                           ifelse(pres20 == ___, "no", NA ) ) )
+      
+    
+    ```
+    
+```{r recode-pres, include = F}
+     
+    gss_subset <- gss_subset %>%
+            mutate( support_biden = ifelse(pres20 == 1, "yes",  
+                                ifelse(pres20 == 2 | pres20 == 3, "no", NA ) ) )
+                 
+    gss_subset %>% count(support_biden)
+    
+```
+
+
+## Hypothesis testing using simulation
+
+In this section, we will make inference about the U.S. population using data from the General Social Survey. In particular, we are interested in testing certain hypotheses about the population using our sample estimates. 
+
+We will begin with assessing claims about a population proportion.  For example, we now know that Biden won the 2020 U.S. Presidential elections with 51% of the popular vote. 
+
+4. What percentage of the GSS respondents who cast a vote said they voted for Biden? Using R as a calculator, find this value and save it in a variable called `obs_prop`. Don't forget to print the value of `obs_prop`. Be sure to show code and output (without messages/warnings)
+
+    *Hint:* use the frequency distribution from Exercise 3 to do your calculation. Do not count the missing values since these respondents did not cast a vote.
+
+    ```{r include = F}
+    obs_prop <- 1417/(965+1417)
+    obs_prop
+    
+    ```
+
+Clearly the proportion of voters in our sample who claim to have voted for Biden is larger than 51%. Could this discrepancy be explained by sampling variation? In this section we will use the analogy of randomly drawing 3,544 tickets from a box where 51% of the tickets say "yes" and 49% say "no" as a way to mimic the sampling variability. 
+
+5. Let's use `tidymodels` to simulate the benchmark of what we should typically see for `obs_prop` if our sample of 3,544 individuals was taken from a population where 51% of the voters support Biden. 
+
+     Fill in the blanks in the code chunk below. Then print the first five rows the dataframe `null_dist`. Be sure to show code and output (without messages/warnings)
+
+    ```{r, eval=F}
+
+    set.seed(114)   
+
+    null_dist <- ___ %>%
+            filter(!is.na( ) ) %>%
+            specify(response = ___, 
+                    success = "___") %>%
+              hypothesize(null = "point", 
+                          p = ___) %>%
+               generate(reps = 1000, 
+                        type = "___") %>%
+               calculate(stat="___")
+
+    ```
+
+    ```{r include = FALSE}
+
+
+    set.seed(114)   
+
+    null_dist <- gss_subset %>%
+            filter(!is.na(support_biden) ) %>%
+            specify(response = support_biden, 
+                    success = "yes") %>%
+              hypothesize(null = "point", 
+                          p = 0.51) %>%
+               generate(reps = 1000, 
+                        type = "draw") %>%
+               calculate(stat="prop")
+    
+    null_dist %>% slice_head(n=5)
+
+    ```
+
+
+Now that we have a benchmark of what we should see, let us assess whether our `obs_prop` fits in with this picture or if it is **unusually large**.
+
+6. Fill in the blanks in the code below to visualize the null distribution and also shade the p-value. What is the p-value? Be sure to show code and output (without messages/warnings)
+
+    ```{r eval = F}
+    
+    null_dist %>% visualize + 
+                    shade_p_value(obs_stat = ___, 
+                                  direction = "___")
+    
+    
+    ```
+
+    ```{r include = FALSE}
+    
+    null_dist %>% visualize + 
+                    shade_p_value(obs_stat = obs_prop, direction = "greater")
+    
+    null_dist %>% get_p_value(obs_stat = obs_prop, direction = "greater")
+    ```
+    
+ 
+Clearly, our data is highly inconsistent with what we should see if in fact Biden only won 51% of the popular vote. In fact a p-value of 0 says that we would never see such a large sample value as the one we saw with simply sampling variation. 
+
+So what should we conclude? Normally, this type of evidence against the null hypothesis would lead us to reject it resoundingly and conclude that the data provides very strong evidence that Biden would win more than 51% of the popular vote. 
+
+However, there are may be other explanations that are relevant here. A task force convened by the American Association for Public Opinion Research concluded that pre-election polls in the 2020 U.S. Presidential Elections (which includes the GSS) overstated support for Joe Biden by margins that were higher than polling errors made in the last 40 years! 
+See this [article](https://news.vanderbilt.edu/2021/07/19/pre-election-polls-in-2020-had-the-largest-errors-in-40-years/) which  offers some explanations for why this might have occurred.
+
+
+
+The idea of using simulation for testing whether a population value could be some hypothesized number applies to any numerical summary. For example, we can assess a claim about a population mean, median etc. The details will of course vary and we will not study these extensions here.
+
+## Hypothesis Testing using randomization
+
+In this section we will test whether women were more likely to support Biden in 2020 than men by conducting a significance test which uses permutation (or shuffling a deck of cards) as a way to mimic sampling variability.
+
+<!---
+
+7. Create a segmented bar chart to show the relationship between `sex_label` and `suppprt_biden` by filling in the blanks in the table below. Do the variables appear related?
+
+    Hint: see the slidedeck from 4/17 in week 4 on the Class Schedule page. Be sure to filter out the missing valus for both variables in the data argument
+    
+    ```{r eval = F}
+   
+    ggplot(data = ___ %>% 
+                     filter(!is.na(), !is.na()), 
+           mapping = aes(x = ___,
+                         fill = ___) ) +
+      geom_bar(position = "fill") +
+      labs( title = " ___",
+            x = " ___") +
+      scale_fill_viridis_d()
+    
+    ```
+    
+    ```{r include = F}
+   
+    ggplot(data = gss_subset %>% filter(!is.na(sex_label), !is.na(support_biden)), 
+           mapping = aes(x = sex_label,
+                         fill = support_biden) ) +
+      geom_bar(position = "fill") +
+      labs( title = " Sex vs. support for Biden",
+            x = " party") +
+      scale_fill_viridis_d()
+    
+    ```
+    
+--->
+
+8.  Create a table to summarise the relationship between `sex_label` and `support_biden`. Then using R as a calculator find the difference between the proportions of women and men who respond "yes" to the `support_biden` question (female - male). Save this difference in a variable called `obs_diff` and also print its value. Be sure to show code and output (without messages/warnings)
+
+    ```{r include =F}
+    
+    gss_subset %>% tabyl(sex_label, support_biden, show_na = FALSE) %>% 
+             adorn_totals(where="col") %>%
+             adorn_title()
+    obs_diff <- 827/1288-587/1087
+    obs_diff
+    ```
+
+9.  Fill in the blanks to  create a benchmark of what we should typically see for `obs_diff` if differences between men and women (female - male) in terms of their support for Biden (`support_biden`) could be explained by sampling variation. 
+Also visualize the null distribution and shade in and calculate the p-value. What do you conclude? Be sure to show code and output (without messages/warnings)
+
+    ```{r eval = F}
+    
+    set.seed(7313)
+
+    null_dist <- gss_subset %>%
+             filter(!is.na(___), !is.na(___) ) %>%
+             specify(response =  ___, 
+                     explanatory = ___,  
+                     success = "___") %>%
+             hypothesize(null = "___") %>%
+             generate(reps = 1000, 
+                      type = "___") %>%
+             calculate(stat = "___", 
+                        order=c("___", "___") )
+
+
+    ```
+
+    ```{r include = F}
+    
+    set.seed(7313)
+
+    null_dist <- gss_subset %>%
+             filter(!is.na(sex_label), !is.na(support_biden)) %>%
+             specify(response =  support_biden, explanatory = sex_label,  success = "yes") %>%
+             hypothesize(null = "independence") %>%
+             generate(reps = 1000, type = "permute") %>%
+             calculate(stat = "diff in props", 
+                        order=c("female", "male") )
+    
+    null_dist %>% visualize() + shade_p_value(obs_stat = obs_diff,
+                                              direction = "greater")
+    
+
+    
+    ```
+
+
+## More analysis
+
+In this section, you will conduct an analysis of whether voters who self identify as black are more likely to lean towards the Democratic party.
+
+9. Recode the `race` and `partyid` variables for your analysis as shown below and then print the frequency distribution of the recoded variables. Be sure to show code and output (without messages/warnings).
+
+    - Create and add a new variable `race_label` from `race` as shown below. 
+
+        |VALUE of `race`|  `race_label`
+        |:--- | :--- 
+        |  2  | black
+        |  1 or 3  | not black
+        
+    - Create and add a new variable `party_label` from `partyid` as follows:
+
+        |VALUE of `partyid`|  `party_label`
+        |:--- | :--- 
+        |  0 or 1  | dem
+        |  2-7  | not dem
+
+
+10. Make a table summarizing the relationship between `race_label` and `party_label`. Then using R as a calculator find the difference between proportion of black and non black voters who lean `dem` (black - not black). Save this difference in a variable called `obs_diff` and print its value. Be sure to show code and output (without messages/warnings). 
+
+10.  Using a seed of 535, create a benchmark of what we should typically see for `obs_diff` if differences between black and non black voters (black - non black) in their preference for the Democratic party could be explained by sampling variation. Print the first five rows of the dataframe you have created. Be sure to show code and output (without messages/warnings).
+
+11. Visualize the null distribution and calculate the p value and make a conclusion. Be sure to show code, output (without messages/warnings) and conclusion.
+
+
+
+```{r include = FALSE}
+gss_subset <- gss_subset %>%
+       mutate(race_label= ifelse(race == 2, "black", "not black" ))
+
+gss_subset %>% count(race_label)
+
+
+
+
+    gss_subset <- gss_subset %>%
+            mutate( party_label = ifelse(partyid == 0 | partyid == 1, "dem","not dem") )  
+                      
+    gss_subset %>% count(party_label)
+    
+    gss_subset %>% tabyl(race_label, party_label, show_na=F) %>%
+      adorn_totals(where="col") %>%
+      adorn_title()
+    
+      obs_diff <- 278/552 - 757/2907
+      
+      
+set.seed(535)
+
+null_dist <- gss_subset %>%
+      filter(!is.na(race_label), !is.na(party_label)) %>%
+      specify(response  = party_label, 
+              explanatory = race_label,
+              success = "dem") %>%
+       hypothesize(null = "independence") %>%
+       generate(reps = 1000, type = "permute") %>%
+       calculate(stat = "diff in props", 
+                 order = c("black", "not black") )
+
+null_dist %>% visualize() + shade_p_value(obs_stat = obs_diff, direction = "greater")
+
+```
+
+* * *
+
+<div id="boxedtext">
+
+`r emo::ji("face")` You may have noticed that all of our sample values were extremely unusual relative to what is expected from sample variability. This will typically be the case when the sample sizes are huge (as they are here) because the sample to sample variability will be extremely small.   So any deviations will be magnified and look really huge. 
+
+This is one of the reasons that an excessive reliance on p-values to make decisions is not a good idea.
+
+</div>
+
+## Wrap up
+
+Great job! You have concluded your last lab for this quarter. For this lab, you are required to upload the following:
+
+* HTML file  (**unzipped**) 
+
+* Zipped file with Rmarkdown document and the data file you created in CSV format. **We should have everything we need to knit your document. If we cannot run it, you will lose credit.**
+
+
+Also, please log off Jupyterhub `r emo::ji("smile")`
