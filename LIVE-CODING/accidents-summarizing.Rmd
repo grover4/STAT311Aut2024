@@ -98,13 +98,6 @@ Let's now examine the relationship between the light conditions (`light`) and wh
 
 Create a frequency table of each variable to examine their distributions. Go ahead and write code to do this.
 
-```{r 1a}
-
-accidents %>% count(light)
-
-accidents %>% count(hit_parked_car)
-
-``` 
 
 As we can see, the `light` variable has three categories of darkness, two of which are quite sparse. Perhaps we can combine all three into one category and call it "Dark"?
 
@@ -115,10 +108,10 @@ Fill in the blanks in the code chunk to create and add a new variable, called `l
 
 ```{r recode-light, eval = FALSE}
 
-accidents <- accidents %>% 
+    accidents <- accidents %>% 
              mutate( light_cat = ifelse(light == "___" | 
-                                          light == "___" | 
-                                             light == "___", 
+                                        light == "___" | 
+                                        light == "___", 
                                         "Dark", 
                                         light) )
 
@@ -129,27 +122,21 @@ Now let us examine whether light conditions influence whether or not a parked ca
 
 ### Exercise 3
 
-Create a contingency table of the frequencies for `light_cat` and `hit_parked_car`. If there is no association between these variables, what % of cars should be hit regardless of light conditions?
+Create a contingency table of the frequencies for `light_cat` and `hit_parked_car` by filling in the blanks. If there is no association between these variables, what % of cars should be hit regardless of light conditions?
 
 
-    ```{r }
-
-    accidents <- accidents %>% 
-             mutate( light_cat = ifelse(light == "Dark - Street Lights Off" | light == "Dark - Street Lights On" | light == "Dark - No Street Lights", 
-                                        "Dark", 
-                                        light) )
+```{r eval = F}
 
     accidents %>% 
-   tabyl( light_cat, hit_parked_car, show_na = FALSE) %>% 
-   adorn_totals(where = "row") %>%
-   adorn_percentages() %>%
-   adorn_pct_formatting(digits=2) %>%
-   adorn_ns() %>%
-   adorn_title()
-    ```
+       tabyl( ___, ___) %>% 
+       adorn_totals(where = ___ ) %>%
+       adorn_percentages() %>%
+       adorn_pct_formatting(digits=___) %>%
+       adorn_ns() %>%
+       adorn_title()
+```
 
 
-     If there is no association between the light conditions and whether or not a parked car is hit, we should see 11.88% of cars being hit in each row. Clearly, daylight hours have fewer such incidents and the hours when there is no/less light have more such incidents. There is an association between these variables.
 
 
 ### Exercise 4
@@ -168,14 +155,7 @@ Make a segmented bar plot to visualize the contingency table from exercise 3 by 
          fill = ___, 
         title = ___)
     
-    ggplot( data = accidents , 
-        mapping = aes( x = light_cat, 
-                       fill = hit_parked_car ) ) +
-     geom_bar( position = "fill" ) +
-    labs(x= "light condition", 
-         y = "proportion",
-         fill = "hit parked car", 
-        title = "Light conditions vs. hitting parked cars")
+    
 
     
 ```
@@ -183,82 +163,37 @@ Make a segmented bar plot to visualize the contingency table from exercise 3 by 
 
 ### Exercise 5
 
-Make a mosaicplot to visualize the strength of the associations seen in the contingency table. Write a couple of sentences to describe what you learn.
+Fill in the blanks to create a mosaicplot to visualize the strength of the associations seen in the contingency table. Write a couple of sentences to describe what you learn.
 
-```{r}
+```{r eval = F}
 
-mosaicplot(hit_parked_car ~ light_cat, data = accidents, shade = TRUE)
+    mosaicplot(___ ~ ___, data = ___, shade = ___)
 
 ```
 
-We knew from the contingency table that the dark hours have a higher rate of parked cars being hit than the daylight hours. The mosaic plot confirms that the numbers in these cells are statistically meaningful. 
 
 
-<!---## More practice
+## More practice
 
 Do as many as you feel comfortable with and have time for.
 
 Suppose we want to know if `addr_type` is associated with `severity_desc`. Read about these variables in the code book. Then do the following.
 
 
-Make a frequency distribution of each variable separately.
-
-```{r}
-accidents %>% count(addr_type)
-
-accidents %>% count(severity_desc)
-
-```
+- Make a frequency distribution of each variable separately.
 
 
-7. Create and add a new variable to the `accidents` dataframe called `severity` variable which takes the same values as `severity_desc`, except that it combines the categories "Injury Collision" and "Serious Injury Collision" into one category called "Injury collision".
 
-    ```{r} 
-    accidents <- accidents %>% 
-             mutate(severity = ifelse(severity_desc == "Injury Collision" | severity_desc == "Serious Injury Collision", 
-                                        "Injury collision",
-                                         severity_desc) )
-    
-    ```
+- Create and add a new variable to the `accidents` dataframe called `severity` variable which takes the same values as `severity_desc`, except that it combines the categories "Injury Collision" and "Serious Injury Collision" into one category called "Injury collision".
 
 
-8. Create a contingency table of the frequencies for `addr_type` and `severity_desc`. If there is no association between these variables, what % of collisions should be injury collisions regardless of address type?
+- Create a contingency table of the frequencies for `addr_type` and `severity_desc`. If there is no association between these variables, what % of collisions should be injury collisions regardless of address type?
 
     *Hint* think about whether you want `addr_type` on the rows or the column. 
     
-    ```{r}
- accidents %>% 
-   tabyl( addr_type, severity, show_na = FALSE) %>% 
-   adorn_totals(where = "row") %>%
-   adorn_percentages() %>%
-   adorn_pct_formatting(digits=2) %>%
-   adorn_ns() %>%
-   adorn_title()
-
-    ```
+  
+- Make a segmented bar plot to visualize the contingency table you just created.
 
 
-9. Make a segmented bar plot to visualize the contingency table from part 8.
+- Make a mosaicplot to visualize the contingency table from you just created
 
-```{r}
-    ggplot( data = accidents %>% filter(!is.na(addr_type)), 
-        mapping = aes( x = addr_type, 
-                       fill = severity) ) +
-     geom_bar( position = "fill" ) +
-    labs(x= "address type", 
-         y = "proportion",
-         fill = "severity", 
-        title = "Severity of collision vs. address type")
-
-    
-```
-
-
-10. Make a mosaicplot to visualize the contingency table from part 8.
-
-```{r}
-    mosaicplot(severity ~ addr_type, data = accidents, shade = TRUE)
-
-```
-
---->
