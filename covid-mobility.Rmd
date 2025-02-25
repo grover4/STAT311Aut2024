@@ -20,10 +20,6 @@ library(glue)
 library(shiny)
 ```
 
-```{r echo =F, fig.align="center", fig.cap="Image Source: [JTA The Data Scientists](https://www.thedatascientists.com/product-demo/covid-19-pandemic-mobility-trends/)"}
-knitr::include_graphics("covid19-graphic.JPG")
-
-```
 
 
 ## Introduction
